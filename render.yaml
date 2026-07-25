@@ -4,7 +4,7 @@ services:
   - type: web
     name: rmm-dashboard-2
     runtime: node
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npx prisma generate && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
