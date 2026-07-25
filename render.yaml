@@ -1,14 +1,15 @@
+# render.yaml
+
 services:
   - type: web
-    name: rmm-dashboard
+    name: rmm-dashboard-2
     runtime: node
-    rootDir: ./
     buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: DATABASE_URL
         value: file:./prisma/dev.db
       - key: JWT_SECRET
-        value: your-super-secret-key
-      - key: NODE_ENV
-        value: production
+        value: your-super-secret-key-change-this
