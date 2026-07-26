@@ -13,14 +13,16 @@ export async function POST(
         const body = await request.json();
         const { path, recursive } = body;
 
-        const command = await prisma.command.create({
-            data: {
-                agent_id: agentIdNum,
-                command_type: 'delete_file',
-                payload: JSON.stringify({ path, recursive }),
-                status: 'pending'
-            }
-        });
+        const command = {
+            id: Date.now(),
+            agent_id: agentIdNum,
+            command_type: 'delete_file',
+            payload: { path, recursive },
+            status: 'pending',
+            created_at: new Date().toISOString()
+        };
+
+        db.addCommand(agentIdNum, command);
 
         return NextResponse.json({
             command_id: command.id,
