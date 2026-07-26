@@ -1,14 +1,11 @@
 // src/app/api/agents/route.ts
 
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/db';
+import { db } from '@/lib/db-simple';
 
 export async function GET() {
     try {
-        const agents = await prisma.agent.findMany({
-            orderBy: { hostname: 'asc' }
-        });
-        return NextResponse.json({ agents });
+        return NextResponse.json({ agents: db.agents });
     } catch (error) {
         console.error('Error fetching agents:', error);
         return NextResponse.json(
@@ -23,64 +20,50 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { hostname, os, ip_address, agent_version } = body;
 
-        let agent = await prisma.agent.findFirst({
-            where: { hostname }
-        });
+        // Try to find existing agent by hostname
+        let agent = db.getAgentByHostname(hostname);
 
         if (agent) {
-            agent = await prisma.agent.update({
-                where: { id: agent.id },
-                data: {
-                    os: os || agent.os,
-                    ip_address: ip_address || agent.ip_address,
-                    last_seen: new Date(),
-                    status: 'online'
-                }
+            // Update existing agent
+            agent = db.updateAgent(agent.id, {
+                os: os || agent.os,
+                ip_address: ip_address || agent.ip_address,
+                last_seen: new Date().toISOString(),
+                status: 'online'
             });
         } else {
-            // Check if this is Agent 4 (DESKTOP-IJ5F28E)
-            const existingAgent4 = await prisma.agent.findUnique({
-                where: { id: 4 }
-            });
-            
+            // Check if this is the known Agent 4 (DESKTOP-IJ5F28E)
+            const existingAgent4 = db.getAgent(4);
             if (existingAgent4 && hostname === 'DESKTOP-IJ5F28E') {
-                agent = await prisma.agent.update({
-                    where: { id: 4 },
-                    data: {
-                        os: os || existingAgent4.os,
-                        ip_address: ip_address || existingAgent4.ip_address,
-                        last_seen: new Date(),
-                        status: 'online'
-                    }
+                agent = db.updateAgent(4, {
+                    os: os || existingAgent4.os,
+                    ip_address: ip_address || existingAgent4.ip_address,
+                    last_seen: new Date().toISOString(),
+                    status: 'online'
                 });
             } else {
-                agent = await prisma.agent.create({
-                    data: {
-                        hostname,
-                        os,
-                        ip_address,
-                        last_seen: new Date(),
-                        status: 'online'
-                    }
+                // Create new agent
+                agent = db.addAgent({
+                    hostname,
+                    os,
+                    ip_address,
+                    last_seen: new Date().toISOString(),
+                    status: 'online'
                 });
             }
         }
 
-        const pendingCommands = await prisma.command.findMany({
-            where: {
-                agent_id: agent.id,
-                status: 'pending'
-            },
-            orderBy: { created_at: 'asc' }
-        });
+        // Get pending commands
+        const pendingCommands = db.getCommandsForAgent(agent.id)
+            .filter((cmd: any) => cmd.status === 'pending');
 
         return NextResponse.json({
             agent_id: agent.id,
             status: agent.status,
-            pending_commands: pendingCommands.map(cmd => ({
+            pending_commands: pendingCommands.map((cmd: any) => ({
                 id: cmd.id,
                 command_type: cmd.command_type,
-                payload: JSON.parse(cmd.payload)
+                payload: cmd.payload
             }))
         });
     } catch (error) {
