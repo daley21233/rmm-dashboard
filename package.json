@@ -4,27 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio",
-    "prisma:seed": "tsx prisma/seed.ts",
-    "db:push": "prisma db push",
-    "db:pull": "prisma db pull",
-    "db:reset": "prisma migrate reset --force",
-    "postinstall": "prisma generate"
+    "lint": "eslint"
   },
   "dependencies": {
-    "@prisma/client": "^6.5.0",
     "axios": "^1.18.1",
     "bcryptjs": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
     "next": "16.2.10",
     "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "sqlite3": "^5.1.7"
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
@@ -34,14 +24,6 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
-    "prisma": "^6.5.0",
-    "tsx": "^4.19.4",
     "typescript": "^5"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
-  "engines": {
-    "node": "22.x"
   }
 }
