@@ -1,7 +1,7 @@
 // src/app/api/commands/[id]/result/route.ts
 
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/db';
+import prisma from '@/lib/db-simple';
 
 export async function POST(
     request: Request,
