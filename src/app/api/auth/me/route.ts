@@ -1,8 +1,8 @@
 // src/app/api/auth/me/route.ts
 
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/db';
 import { verifyToken, extractToken } from '@/lib/auth';
+import { db } from '@/lib/db-simple';
 
 export async function GET(request: Request) {
     try {
@@ -24,16 +24,8 @@ export async function GET(request: Request) {
             );
         }
 
-        const user = await prisma.user.findUnique({
-            where: { id: payload.userId },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                role: true,
-                created_at: true
-            }
-        });
+        // ✅ Find user in JSON database
+        const user = db.findUserById(payload.userId);
 
         if (!user) {
             return NextResponse.json(
@@ -42,7 +34,15 @@ export async function GET(request: Request) {
             );
         }
 
-        return NextResponse.json({ user });
+        return NextResponse.json({
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                created_at: user.created_at
+            }
+        });
     } catch (error) {
         console.error('❌ Auth check error:', error);
         return NextResponse.json(
