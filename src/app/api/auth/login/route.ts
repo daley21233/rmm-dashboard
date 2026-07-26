@@ -1,8 +1,8 @@
 // src/app/api/auth/login/route.ts
 
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/db';
 import { comparePassword, generateToken } from '@/lib/auth';
+import { db } from '@/lib/db-simple';
 
 export async function POST(request: Request) {
     try {
@@ -18,9 +18,8 @@ export async function POST(request: Request) {
             );
         }
 
-        const user = await prisma.user.findUnique({
-            where: { username }
-        });
+        // ✅ Find user in JSON database
+        const user = db.findUserByUsername(username);
 
         if (!user) {
             console.log('❌ User not found:', username);
@@ -30,6 +29,7 @@ export async function POST(request: Request) {
             );
         }
 
+        // Check password
         const isValid = await comparePassword(password, user.password);
         if (!isValid) {
             console.log('❌ Invalid password for:', username);
@@ -39,6 +39,7 @@ export async function POST(request: Request) {
             );
         }
 
+        // Generate token
         const token = generateToken({
             userId: user.id,
             username: user.username,
@@ -46,21 +47,6 @@ export async function POST(request: Request) {
         });
 
         console.log('✅ Login successful for:', username);
-
-        try {
-            await prisma.auditLog.create({
-                data: {
-                    user_id: user.id,
-                    action: 'LOGIN',
-                    details: `User ${user.username} logged in`,
-                    ip_address: request.headers.get('x-forwarded-for') || 
-                               request.headers.get('x-real-ip') || 
-                               'unknown'
-                }
-            });
-        } catch (logError) {
-            console.warn('⚠️ Failed to create audit log:', logError);
-        }
 
         return NextResponse.json({
             success: true,
@@ -75,7 +61,7 @@ export async function POST(request: Request) {
     } catch (error) {
         console.error('❌ Login error:', error);
         return NextResponse.json(
-            { error: 'Login failed' },
+            { error: 'Login failed: ' + (error instanceof Error ? error.message : 'Unknown error') },
             { status: 500 }
         );
     }
