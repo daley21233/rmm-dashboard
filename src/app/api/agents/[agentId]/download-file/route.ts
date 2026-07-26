@@ -1,7 +1,7 @@
 // src/app/api/agents/[agentId]/download-file/route.ts
 
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/db-simple';
+import { db } from '@/lib/db-simple';
 
 export async function POST(
     request: Request,
