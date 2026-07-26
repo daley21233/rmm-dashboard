@@ -1,7 +1,7 @@
 // src/app/api/agents/[agentId]/list-directory/route.ts
 
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/db';
+import { db } from '@/lib/db-simple';
 
 export async function POST(
     request: Request,
@@ -13,14 +13,16 @@ export async function POST(
         const body = await request.json();
         const { path } = body;
 
-        const command = await prisma.command.create({
-            data: {
-                agent_id: agentIdNum,
-                command_type: 'list_directory',
-                payload: JSON.stringify({ path }),
-                status: 'pending'
-            }
-        });
+        const command = {
+            id: Date.now(),
+            agent_id: agentIdNum,
+            command_type: 'list_directory',
+            payload: { path },
+            status: 'pending',
+            created_at: new Date().toISOString()
+        };
+
+        db.addCommand(agentIdNum, command);
 
         return NextResponse.json({
             command_id: command.id,
