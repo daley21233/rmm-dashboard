@@ -27,7 +27,7 @@ model Command {
   agent_id     Int
   agent        Agent          @relation(fields: [agent_id], references: [id], onDelete: Cascade)
   command_type String
-  payload      String
+  payload      String         // JSON string
   status       String         @default("pending")
   created_at   DateTime       @default(now())
   executed_at  DateTime?
@@ -39,15 +39,15 @@ model CommandResult {
   id          Int       @id @default(autoincrement())
   command_id  Int       @unique
   command     Command   @relation(fields: [command_id], references: [id], onDelete: Cascade)
-  output      String?
-  status      String
+  output      String?   // JSON string or text
+  status      String    // success, error
   executed_at DateTime  @default(now())
 }
 
 model User {
   id          Int       @id @default(autoincrement())
   username    String    @unique
-  password    String
+  password    String    // Hashed password
   email       String?
   role        String    @default("user")
   created_at  DateTime  @default(now())
