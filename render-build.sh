@@ -1,10 +1,12 @@
 #!/bin/bash
 
-# Install dependencies
+echo "=== Installing dependencies ==="
 npm install
 
-# Install TypeScript packages explicitly
+echo "=== Installing TypeScript packages ==="
 npm install --save-dev typescript @types/react @types/node
 
-# Build the project
+echo "=== Running build ==="
 npm run build
+
+echo "=== Build complete ==="
