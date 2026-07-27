@@ -1,9 +1,10 @@
 services:
   - type: web
     name: rmm-dashboard-2
-    runtime: node
-    buildCommand: ./render-build.sh
-    startCommand: npm start
+    runtime: docker
+    repo: https://github.com/daley21233/rmm-dashboard
+    plan: free
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: NODE_ENV
         value: production
