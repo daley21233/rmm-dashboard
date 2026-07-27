@@ -1,10 +1,9 @@
 services:
   - type: web
     name: rmm-dashboard-2
-    runtime: docker
-    repo: https://github.com/daley21233/rmm-dashboard
-    plan: free
-    dockerfilePath: ./Dockerfile
+    runtime: node
+    buildCommand: npm install && npm install --save-dev typescript @types/react @types/node && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
