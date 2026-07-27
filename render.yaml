@@ -1,17 +1,11 @@
 services:
   - type: web
-    name: rmm-dashboard
-    runtime: node
-
-    rootDir: .
-
-    buildCommand: npm install && npm run build
-
-    startCommand: npm start
-
+    name: rmm-dashboard-2
+    runtime: docker
+    repo: https://github.com/daley21233/rmm-dashboard
+    plan: free
     envVars:
-      - key: DATABASE_URL
-        value: file:./prisma/dev.db
-
+      - key: NODE_ENV
+        value: production
       - key: JWT_SECRET
-        generateValue: true
+        value: your-super-secret-key-change-this
