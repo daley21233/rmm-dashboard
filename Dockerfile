@@ -2,14 +2,16 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
-RUN npm install
 
-# Explicitly install TypeScript
-RUN npm install --save-dev typescript @types/react @types/node
+# Install ALL dependencies including TypeScript
+RUN npm install && npm install --save-dev typescript @types/react @types/node
 
+# Copy the rest of the code
 COPY . .
 
+# Build the app
 RUN npm run build
 
 EXPOSE 3000
